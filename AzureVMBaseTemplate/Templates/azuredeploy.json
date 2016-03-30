@@ -127,7 +127,7 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "parameters('vmname')",
+          "computerName": "[parameters('vmname')]",
           "adminUsername": "[parameters('vmAdminUsername')]",
           "adminPassword": "[parameters('vmAdminPassword')]"
         },
@@ -139,7 +139,7 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "concat('VDSK_', parameters('vmname'), 'DISK0')",
+            "name": "[concat('VDSK_', parameters('vmname'), 'DISK0')]",
             "vhd": {
               "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmname'), '_DISK0.vhd')]"
             },
@@ -148,7 +148,7 @@
           },
           "dataDisks": [
             {
-               "name": "concat('VDSK_', parameters('vmname'), 'DISK0')",
+               "name": "[concat('VDSK_', parameters('vmname'), 'DISK0')]",
               "vhd": {
                 "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmname'), '_DISK1.vhd')]"
               },
