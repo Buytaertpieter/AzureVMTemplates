@@ -148,7 +148,7 @@
           },
           "dataDisks": [
             {
-               "name": "[concat('VDSK_', parameters('vmname'), 'DISK0')]",
+               "name": "[concat('VDSK_', parameters('vmname'), 'DISK1')]",
               "vhd": {
                 "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmname'), '_DISK1.vhd')]"
               },
