@@ -94,7 +94,7 @@
             "name": "ipconfig",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "parameters('PrivateIPAddress')",
+              "privateIPAddress": "[parameters('PrivateIPAddress')]",
               "subnet": {
                 "id": "[variables('subnetId')]"
               }
