@@ -8,25 +8,15 @@
         "description": "Private IP adress used for the chosen subnet"
       }
     },
-    "existingVNETName": {
+    "environment": {
       "type": "string",
+      "defaultValue": "MFC_MGT_servers",
       "allowedValues": [
-        "VNET_MFC_MGT"
-      ],
-      "metadata": {
-        "description": "Existing VNET that contains the domain controller"
-      }
+        "MFC_MGT_servers",
+        "MFC_MGT_DMZ"
+      ]
     },
-    "existingSubnetName": {
-      "type": "string",
-      "allowedValues": [
-        "VNET_MFC_SUBNET_Servers", 
-        "VNET_MFC_SUBNET_DMZ"
-      ],
-      "metadata": {
-        "description": "Existing subnet that contains the domain controller"
-      }
-    },
+    
     "vmname": {
       "type": "string",
       "metadata": {
@@ -36,7 +26,7 @@
     "vmSize": {
       "type": "string",
       "defaultValue": "Standard_A2",
-      "allowedValues": [ "Standard_A2" ],
+      "allowedValues": [ "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4", "Standard_D1", "Standard_D2", "Standard_D3", "Standard_D4", "Standard_DS1", "Standard_DS2", "Standard_DS3", "Standard_DS4" ],
       "metadata": {
         "description": "The size of the virtual machines"
       }
@@ -64,14 +54,34 @@
     }
   },
 
-  "variables": { 
+  "variables": {
+    "settings_MFC_MGT_servers": {
+      "vnet": "VNET_MFC_MGT",
+      "subnet": "VNET_MFC_SUBNET_Servers",
+      "DNSServers": [
+        "172.20.245.10",
+        "172.20.69.10",
+        "172.20.66.10"
+      ]
+    },
+    "settings_MFC_MGT_DMZ": {
+      "vnet": "VNET_MFC_MGT",
+      "subnet": "VNET_MFC_SUBNET_DMZ",
+      "DNSServers": [
+        "172.20.2409.10",
+        "172.20.64.10",
+        "172.20.62.10"
+      ]
+    },
+    "selectedSettings": "[concat('settings_', parameters('environment'))]",
+    "nicName": "[concat('VNIC_',parameters('vmname'), '_' ,variables(variables('selectedSettings')).subnet)]",
+    "vnetID": "[resourceId('RG_MFC_NetworkMGTSystems', 'Microsoft.Network/virtualNetworks', variables(variables('selectedSettings')).vnet)]",
+    "subnetId": "[concat(variables('vnetID'),'/subnets/', variables(variables('selectedSettings')).subnet)]",
+
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
     "windowsOSVersion": "2012-R2-Datacenter",
-    "apiVersion": "2015-06-15",
-    "nicName": "[concat('VNIC_',parameters('vmname'), '_' ,parameters('existingSubnetName'))]",
-    "vnetID": "[resourceId('RG_MFC_NetworkMGTSystems', 'Microsoft.Network/virtualNetworks', parameters('existingVNETName'))]",
-    "subnetId": "[concat(variables('vnetID'),'/subnets/', parameters('existingSubnetName'))]"
+    "apiVersion": "2015-06-15"
   },
   "resources": [
     {
@@ -103,12 +113,14 @@
         ],
         "dnsSettings": {
           "dnsServers": [
+            "172.20.245.10",
             "172.20.69.10",
             "172.20.66.10"
           ],
           "appliedDnsServers": [
-            "172.20.69.10",
-            "172.20.66.10"
+            "172.20.245.10",
+            "172.20.66.10",
+            "172.20.69.10"
           ]
         }
       }
