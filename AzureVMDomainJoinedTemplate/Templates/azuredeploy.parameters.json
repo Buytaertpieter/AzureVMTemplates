@@ -1,0 +1,36 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingVNETName": {
+      "value": "VNET_MFC_MGT"
+    },
+    "PrivateIPAddress": {
+      "value": "172.20.245.210"
+      },
+      "existingSubnetName": {
+        "value": "VNET_MFC_SUBNET_Servers"
+      },
+      "vmSize": {
+        "value": "Standard_A2"
+      },
+      "vmAdminUsername": {
+        "value": "fcs_admin"
+      },
+      "vmname": {
+        "value": "TESTRollout"
+      },
+      "storageAccountName": {
+        "value": "staccmfcscom"
+      },
+      "domainToJoin": {
+          "value": "fcscloud.local"
+      },
+      "domainpassword": {
+          "value": "fFZ2e8APNg1h5Gw"
+      },
+      "vmAdminPassword": {
+          "value": "9kGsvNFXWgN34kECRu3"
+      }
+    }
+  }
