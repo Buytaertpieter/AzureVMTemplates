@@ -117,7 +117,7 @@
         "dnsSettings": {
           "dnsServers": [
             "172.20.245.10",
-            "172.2.69.10"
+            "172.20.69.10"
           ],
           "appliedDnsServers": [
             "172.20.245.10",
@@ -202,7 +202,8 @@
         "settings": {
           "Name": "[parameters('domainToJoin')]", 
           "User": "concat(parameters('domainToJoin'),'\\',variables('domainusername'))",
-          "Restart": "true"
+          "Restart": "true",
+          "options":  1
         },
         "protectedsettings": {
           "Password": "[parameters('domainPassword')]"
