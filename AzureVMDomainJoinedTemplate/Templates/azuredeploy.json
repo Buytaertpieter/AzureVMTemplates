@@ -10,6 +10,7 @@
     },
     "domainToJoin": {
       "type": "string",
+      "defaultValue": "fcscloud.local",
       "allowedValues": [
         "fcscloud.local",
         "dmzfcscloud.local"
@@ -17,6 +18,7 @@
     },
     "existingVNETName": {
       "type": "string",
+      "defaultValue": "VNET_MFC_MGT",
       "allowedValues": [
         "VNET_MFC_MGT"
       ],
@@ -26,6 +28,7 @@
     },
     "existingSubnetName": {
       "type": "string",
+      "defaultValue": "VNET_MFC_SUBNET_Servers",
       "allowedValues": [
         "VNET_MFC_SUBNET_Servers",
         "VNET_MFC_SUBNET_DMZ"
@@ -200,10 +203,11 @@
         "type": "JsonADDomainExtension",
         "typeHandlerVersion": "1.0",
         "settings": {
-          "Name": "[parameters('domainToJoin')]", 
+          "Name": "[parameters('domainToJoin')]",
+          "OUPath": "servers",
           "User": "concat(parameters('domainToJoin'),'\\',variables('domainusername'))",
           "Restart": "true",
-          "options":  1
+          "options": "1"
         },
         "protectedsettings": {
           "Password": "[parameters('domainPassword')]"
