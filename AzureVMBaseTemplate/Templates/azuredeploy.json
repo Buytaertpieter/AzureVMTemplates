@@ -117,8 +117,8 @@
           }
         ],
         "dnsSettings": {
-          "dnsServers": "variables(variables('selectedSettings')).vnet]",
-          "appliedDnsServers":"variables(variables('selectedSettings')).vnet]"
+          "dnsServers": "variables(variables('selectedSettings')).DNSServers)",
+          "appliedDnsServers":"variables(variables('selectedSettings')).DNSServers)"
         }
       }
     },
