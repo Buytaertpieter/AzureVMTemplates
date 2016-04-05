@@ -117,16 +117,8 @@
           }
         ],
         "dnsSettings": {
-          "dnsServers": [
-            "172.20.245.10",
-            "172.20.69.10",
-            "172.20.66.10"
-          ],
-          "appliedDnsServers": [
-            "172.20.245.10",
-            "172.20.66.10",
-            "172.20.69.10"
-          ]
+          "dnsServers": "variables(variables('selectedSettings')).vnet]",
+          "appliedDnsServers":"variables(variables('selectedSettings')).vnet]"
         }
       }
     },
