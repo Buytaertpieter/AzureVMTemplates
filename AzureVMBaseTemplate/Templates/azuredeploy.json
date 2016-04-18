@@ -73,7 +73,7 @@
       "vnet": "VNET_MFC_MGT",
       "subnet": "VNET_MFC_SUBNET_DMZ",
       "DNSServers": [
-        "172.20.249.10",
+        "172.20.240.10",
         "172.20.64.10",
         "172.20.62.10"
       ]
