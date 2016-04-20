@@ -2,29 +2,31 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
     "parameters": {
-        "existingVNETName": {
-            "value": "VNET_MFC_MGT"
-        },
+       
         "PrivateIPAddress": {
-            "value": "172.20.245.21"
+            "value": "172.20.240.32"
         },
-        "existingSubnetName": {
-            "value": "VNET_MFC_SUBNET_Servers"
-        },
+       
         "vmSize": {
             "value": "Standard_A2"
         },
         "vmAdminUsername": {
-            "value": "fcsadmin"
+            "value": "fcs_admin"
         },
         "vmname": {
-            "value": "SR21370112001"
+            "value": "SR21220136411"
         },
         "srcVHD": {
-            "value": "https://staccmfcsccm.blob.core.windows.net/vhds/SR212201364012016313142944.vhd"
+            "value": "https://staccmfcsccm.blob.core.windows.net/vhds/VDSK_SR21220136411_DISK0.vhd"
         },
         "storageAccountName": {
-            "value": "staccmfcbck"
+            "value": "staccmfcsccm"
+        },
+        "environment": {
+            "value": "MFC_MGT_DMZ"
+        },
+        "availabilityset": {
+            "value": "AS_MFC_SCCMMP"
         }
     }
   }

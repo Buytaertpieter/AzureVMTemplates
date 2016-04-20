@@ -80,20 +80,17 @@
         "settings_MFC_MGT_servers": {
             "vnet": "VNET_MFC_MGT",
             "subnet": "VNET_MFC_SUBNET_Servers",
-            "DNSServers": [
-                "172.20.245.10",
-                "172.20.69.10",
-                "172.20.66.10"
-            ]
+            "DNSServer1": "172.20.245.10",
+            "DNSServer2": "172.20.69.10",
+            "DNSServer3": "172.20.66.10"
         },
+
         "settings_MFC_MGT_DMZ": {
             "vnet": "VNET_MFC_MGT",
             "subnet": "VNET_MFC_SUBNET_DMZ",
-            "DNSServers": [
-                "172.20.249.10",
-                "172.20.64.10",
-                "172.20.62.10"
-            ]
+            "DNSServer1": "172.20.240.10",
+            "DNSServer2": "172.20.64.10",
+            "DNSServer3": "172.20.62.10"
         },
         "selectedSettings": "[concat('settings_', parameters('environment'))]",
         "nicName": "[concat('VNIC_',parameters('vmname'), '_' ,variables(variables('selectedSettings')).subnet)]",
@@ -134,14 +131,9 @@
                 ],
                 "dnsSettings": {
                     "dnsServers": [
-                        "172.20.245.10",
-                        "172.20.69.10",
-                        "172.20.66.10"
-                    ],
-                    "appliedDnsServers": [
-                        "172.20.245.10",
-                        "172.20.69.10",
-                        "172.20.66.10"
+                        "[variables(variables('selectedSettings')).DNSServer1]",
+                        "[variables(variables('selectedSettings')).DNSServer2]",
+                        "[variables(variables('selectedSettings')).DNSServer3]"
                     ]
                 }
             }
