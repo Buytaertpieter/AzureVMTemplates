@@ -1,205 +1,211 @@
 ﻿{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {
-    "PrivateIPAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Private IP adress used for the chosen subnet"
-      }
-    },
-    "environment": {
-      "type": "string",
-      "defaultValue": "MFC_MGT_servers",
-      "allowedValues": [
-        "MFC_MGT_servers",
-        "MFC_MGT_DMZ"
-      ]
-    },
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique public DNS prefix for the deployment. The fqdn will look something like '<dnsname>.westus.cloudapp.azure.com'. Up to 62 chars, digits or dashes, lowercase, should start with a letter: must conform to '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'."
+            }
+        },
 
-    "availabilityset": {
-      "type": "string"
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A2",
+            "allowedValues": [ "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4", "Standard_D1_v2", "Standard_D2_v2", "Standard_D3_v2", "Standard_D4_v2", "Standard_DS1", "Standard_DS2", "Standard_DS3", "Standard_DS4" ],
+            "metadata": {
+                "description": "The size of the virtual machines"
+            }
+        },
 
+        "availabilityset": {
+            "type": "string"
+        },
+
+        "environment": {
+            "type": "string",
+            "defaultValue": "MFC_MGT_servers",
+            "allowedValues": [
+                "MFC_MGT_Servers",
+                "MFC_MGT_DMZ"
+            ]
+        },
+
+        "privateIPAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Private IP adress used for the chosen subnet"
+            }
+        },
+
+        "vmAdminUsername": {
+            "type": "string",
+            "defaultValue": "fcs_admin",
+            "allowedValues": [ "fcs_admin" ],
+            "metadata": {
+                "description": "The name of the administrator of the new VM and the domain. Exclusion list: 'admin','administrator"
+            }
+        },
+
+        "vmAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The password for the administrator account of the new VM and the domain"
+            }
+        },
+
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "the name of the storage account, naming convention:  stacc<customer/department><name of resource group the account belongs to> "
+            }
+        }
     },
     
-    "vmname": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique public DNS prefix for the deployment. The fqdn will look something like '<dnsname>.westus.cloudapp.azure.com'. Up to 62 chars, digits or dashes, lowercase, should start with a letter: must conform to '^[a-z][a-z0-9-]{1,61}[a-z0-9]$'."
-      }
-    },
-    "vmSize": {
-      "type": "string",
-      "defaultValue": "Standard_A2",
-      "allowedValues": [ "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4", "Standard_D1_v2", "Standard_D2_v2", "Standard_D3_v2", "Standard_D4_v2", "Standard_DS1", "Standard_DS2", "Standard_DS3", "Standard_DS4" ],
-      "metadata": {
-        "description": "The size of the virtual machines"
-      }
-    },
-    "vmAdminUsername": {
-      "type": "string",
-      "defaultValue": "fcs_admin",
-      "allowedValues": [ "fcs_admin" ],
-      "metadata": {
-        "description": "The name of the administrator of the new VM and the domain. Exclusion list: 'admin','administrator"
-      }
-    },
-    "vmAdminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password for the administrator account of the new VM and the domain"
-      }
-    },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "the name of the storage account, naming convention:  stacc<customer/department><name of resource group the account belongs to> "
-      }
-    }
-  },
+    "variables": {
+        "settings_MFC_MGT_Servers": {
+            "vnet": "VNET_MFC_MGT",
+            "subnet": "VNET_MFC_SUBNET_Servers",
+            "DNSServers": [
+                "172.20.245.10",
+                "172.20.69.10",
+                "172.20.66.10"
+            ]
+        },
 
-  "variables": {
-    "settings_MFC_MGT_servers": {
-      "vnet": "VNET_MFC_MGT",
-      "subnet": "VNET_MFC_SUBNET_Servers",
-      "DNSServers": [
-        "172.20.245.10",
-        "172.20.69.10",
-        "172.20.66.10"
-      ]
-    },
-    "settings_MFC_MGT_DMZ": {
-      "vnet": "VNET_MFC_MGT",
-      "subnet": "VNET_MFC_SUBNET_DMZ",
-      "DNSServers": [
-        "172.20.240.10",
-        "172.20.64.10",
-        "172.20.62.10"
-      ]
-    },
-    "selectedSettings": "[concat('settings_', parameters('environment'))]",
-    "nicName": "[concat('VNIC_',parameters('vmname'), '_' ,variables(variables('selectedSettings')).subnet)]",
-    "vnetID": "[resourceId('RG_MFC_NetworkMGTSystems', 'Microsoft.Network/virtualNetworks', variables(variables('selectedSettings')).vnet)]",
-    "subnetId": "[concat(variables('vnetID'),'/subnets/', variables(variables('selectedSettings')).subnet)]",
+        "settings_MFC_MGT_DMZ": {
+            "vnet": "VNET_MFC_MGT",
+            "subnet": "VNET_MFC_SUBNET_DMZ",
+            "DNSServers": [
+                "172.20.240.10",
+                "172.20.64.10",
+                "172.20.62.10"
+            ]
+        },
 
-    "imagePublisher": "MicrosoftWindowsServer",
-    "imageOffer": "WindowsServer",
-    "windowsOSVersion": "2012-R2-Datacenter",
-    "apiVersion": "2015-06-15"
-  },
-  "resources": [
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('storageAccountName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
+        "selectedSettings": "[concat('settings_', parameters('environment'))]",
+        "nicName": "[concat('VNIC_',parameters('vmName'), '_' ,variables(variables('selectedSettings')).subnet)]",
+        "vnetID": "[resourceId('RG_MFC_NetworkMGTSystems', 'Microsoft.Network/virtualNetworks', variables(variables('selectedSettings')).vnet)]",
+        "subnetId": "[concat(variables('vnetID'),'/subnets/', variables(variables('selectedSettings')).subnet)]",
+        "imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer",
+        "windowsOSVersion": "2012-R2-Datacenter",
+        "apiVersion": "2015-06-15"
     },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig",
+
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[resourceGroup().location]",
             "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('PrivateIPAddress')]",
-              "subnet": {
-                "id": "[variables('subnetId')]"
-              }
+                "accountType": "Standard_LRS"
             }
-          }
-        ],
-        "dnsSettings": {
-          "dnsServers": [
-            "172.20.245.10",
-            "172.20.69.10",
-            "172.20.66.10"
-          ],
-          "appliedDnsServers": [
-            "172.20.245.10",
-            "172.20.69.10",
-            "172.20.66.10"
-          ]
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('privateIPAddress')]",
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            }
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": [
+                        "172.20.245.10",
+                        "172.20.69.10",
+                        "172.20.66.10"
+                    ],
+                    "appliedDnsServers": [
+                        "172.20.245.10",
+                        "172.20.69.10",
+                        "172.20.66.10"
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availabilityset')]",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccountName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilityset'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilityset'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('vmAdminUsername')]",
+                    "adminPassword": "[parameters('vmAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[variables('windowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat('VDSK_', parameters('vmName'), 'DISK0')]",
+                        "vhd": {
+                            "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmName'), '_DISK0.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[concat('VDSK_', parameters('vmName'), 'DISK1')]",
+                            "vhd": {
+                                "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmName'), '_DISK1.vhd')]"
+                            },
+                            "caching": "None",
+                            "createOption": "Empty",
+                            "diskSizeGB": "1000",
+                            "lun": 0
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net')]"
+                    }
+                }
+            }
         }
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[parameters('availabilityset')]",
-      "location": "[resourceGroup().location]"
-    },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccountName'))]",
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
-        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilityset'))]"
-      ],
-      "properties": {
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilityset'))]"
-        },
-        "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[parameters('vmname')]",
-          "adminUsername": "[parameters('vmAdminUsername')]",
-          "adminPassword": "[parameters('vmAdminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[variables('windowsOSVersion')]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[concat('VDSK_', parameters('vmname'), 'DISK0')]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmname'), '_DISK0.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          },
-          "dataDisks": [
-            {
-              "name": "[concat('VDSK_', parameters('vmname'), 'DISK1')]",
-              "vhd": {
-                "uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/VDSK_', parameters('vmname'), '_DISK1.vhd')]"
-              },
-              "caching": "None",
-              "createOption": "Empty",
-              "diskSizeGB": "1000",
-              "lun": 0
-            }
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
-            }
-          ]
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": "true",
-            "storageUri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net')]"
-          }
-        }
-      }
-    }
-  ]
+    ]
 }
