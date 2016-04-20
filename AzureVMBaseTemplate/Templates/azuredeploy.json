@@ -24,7 +24,7 @@
 
         "environment": {
             "type": "string",
-            "defaultValue": "MFC_MGT_servers",
+            "defaultValue": "MFC_MGT_Servers",
             "allowedValues": [
                 "MFC_MGT_Servers",
                 "MFC_MGT_DMZ"
@@ -62,29 +62,30 @@
             }
         }
     },
-    
+
     "variables": {
         "settings_MFC_MGT_Servers": {
             "vnet": "VNET_MFC_MGT",
             "subnet": "VNET_MFC_SUBNET_Servers",
-            "DNSServers": [
-                "172.20.245.10",
-                "172.20.69.10",
-                "172.20.66.10"
-            ]
+            "DNSServer1": "172.20.245.10",
+            "DNSServer2": "172.20.69.10",
+            "DNSServer3": "172.20.66.10"
         },
+        
+        "settings_MFC_MGT_Servers_DNSServers": [ "172.20.245.10", "172.20.69.10", "172.20.66.10" ],
 
         "settings_MFC_MGT_DMZ": {
             "vnet": "VNET_MFC_MGT",
             "subnet": "VNET_MFC_SUBNET_DMZ",
-            "DNSServers": [
-                "172.20.240.10",
-                "172.20.64.10",
-                "172.20.62.10"
-            ]
+            "DNSServer1": "172.20.240.10",
+            "DNSServer2": "172.20.64.10",
+            "DNSServer3": "172.20.62.10"
         },
 
+        "settings_MFC_MGT_DMZ_DNSServers": [ "172.20.240.10", "172.20.64.10", "172.20.62.10" ],
+        
         "selectedSettings": "[concat('settings_', parameters('environment'))]",
+        "selectedDNSServers": "[concat('settings_', parameters('environment'), '_DNSServers')]",
         "nicName": "[concat('VNIC_',parameters('vmName'), '_' ,variables(variables('selectedSettings')).subnet)]",
         "vnetID": "[resourceId('RG_MFC_NetworkMGTSystems', 'Microsoft.Network/virtualNetworks', variables(variables('selectedSettings')).vnet)]",
         "subnetId": "[concat(variables('vnetID'),'/subnets/', variables(variables('selectedSettings')).subnet)]",
@@ -104,6 +105,7 @@
                 "accountType": "Standard_LRS"
             }
         },
+
         {
             "apiVersion": "[variables('apiVersion')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -124,24 +126,21 @@
                 ],
                 "dnsSettings": {
                     "dnsServers": [
-                        "172.20.245.10",
-                        "172.20.69.10",
-                        "172.20.66.10"
-                    ],
-                    "appliedDnsServers": [
-                        "172.20.245.10",
-                        "172.20.69.10",
-                        "172.20.66.10"
+                        "[variables(variables('selectedSettings')).DNSServer1]",
+                        "[variables(variables('selectedSettings')).DNSServer2]",
+                        "[variables(variables('selectedSettings')).DNSServer3]"
                     ]
                 }
             }
         },
+
         {
             "apiVersion": "[variables('apiVersion')]",
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('availabilityset')]",
             "location": "[resourceGroup().location]"
         },
+
         {
             "apiVersion": "[variables('apiVersion')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -152,18 +151,22 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
                 "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilityset'))]"
             ],
+
             "properties": {
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilityset'))]"
                 },
+
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
+
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
                     "adminUsername": "[parameters('vmAdminUsername')]",
                     "adminPassword": "[parameters('vmAdminPassword')]"
                 },
+
                 "storageProfile": {
                     "imageReference": {
                         "publisher": "[variables('imagePublisher')]",
@@ -171,6 +174,7 @@
                         "sku": "[variables('windowsOSVersion')]",
                         "version": "latest"
                     },
+
                     "osDisk": {
                         "name": "[concat('VDSK_', parameters('vmName'), 'DISK0')]",
                         "vhd": {
@@ -179,6 +183,7 @@
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     },
+
                     "dataDisks": [
                         {
                             "name": "[concat('VDSK_', parameters('vmName'), 'DISK1')]",
@@ -187,11 +192,12 @@
                             },
                             "caching": "None",
                             "createOption": "Empty",
-                            "diskSizeGB": "1000",
+                            "diskSizeGB": "1023",
                             "lun": 0
                         }
                     ]
                 },
+
                 "networkProfile": {
                     "networkInterfaces": [
                         {
@@ -199,6 +205,7 @@
                         }
                     ]
                 },
+
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
